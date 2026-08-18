@@ -30,7 +30,7 @@ In-package relative imports use explicit `.ts` specifiers in source (for example
 
 | File | Change |
 |---|---|
-| `tsconfig.base.json` | no edit for an existing group; for a new group, add a `./packages/<group>/*/src` candidate to the `@deepseek-ai/dsh-*` wildcard |
+| `tsconfig.base.json` | no edit for an existing group; for a new group, add a `./packages/<group>/*/src` candidate to the `@deepseek-ai/dsh-*` wildcard. That candidate only maps directories named like the npm short name; a group whose npm names prefix the group dir (`dsh-<group>-<dir>`) instead adds a dedicated `@deepseek-ai/dsh-<group>-*` wildcard pair — see the host/client/intranet entries |
 | `tsconfig.host.json` (Host package) or `tsconfig.client.json` (Client package) | add `{ "path": "./packages/<group>/<pkg>" }` to `references` — an ordinary package belongs to exactly one aggregate, never both. `api/remotes` uses a repository-specific split because the Host generates a contract that the Client consumes in a later phase; new packages must not copy it ([layout](../development.md#typescript-project-layout)) |
 | `knip.json` | only if the package has entrypoints that repository discovery does not already cover |
 
