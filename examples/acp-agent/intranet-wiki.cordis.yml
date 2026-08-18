@@ -1,0 +1,19 @@
+# Intranet-wiki composition for the intranet-wiki snapshot scenario: the three
+# wiki tools under the `ask` write policy plus the loopback Confluence-style
+# fixture the prompt reads and writes against — deterministic content, no
+# company network, in recording and replay alike. The scenario row supplies
+# the credential reference values via env.
+- id: base
+  name: '@deepseek-ai/cordis-plugin-include'
+  config:
+    path: ./cordis.yml
+    patches:
+      - insert:
+          - id: intranet-wiki-fixture
+            name: './intranet-wiki-fixture-server.mjs'
+          - id: intranet-tool-wiki
+            name: '@deepseek-ai/dsh-intranet-tool-wiki'
+            config:
+              baseUrlEnv: INTRANET_WIKI_SNAPSHOT_BASE_URL
+              tokenEnv: INTRANET_WIKI_SNAPSHOT_TOKEN
+              applyWriteApproval: ask
