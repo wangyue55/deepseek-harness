@@ -324,6 +324,7 @@ const SCENARIOS: Scenario[] = [
     recorded: true,
     pinsHeader: true,
     headerClass: 'intranet-gitlab',
+    systemPromptSource: 'product-subagent-codex',
     configPath: INTRANET_GITLAB_CONFIG,
     env: {
       INTRANET_GITLAB_SNAPSHOT_BASE_URL: 'http://127.0.0.1:43122',
