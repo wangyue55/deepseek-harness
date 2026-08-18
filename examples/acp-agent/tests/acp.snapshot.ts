@@ -322,6 +322,8 @@ const SCENARIOS: Scenario[] = [
     name: 'intranet-gitlab',
     hasModelTurn: true,
     recorded: true,
+    pinsHeader: true,
+    headerClass: 'intranet-gitlab',
     configPath: INTRANET_GITLAB_CONFIG,
     env: {
       INTRANET_GITLAB_SNAPSHOT_BASE_URL: 'http://127.0.0.1:43122',
