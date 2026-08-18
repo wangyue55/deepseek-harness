@@ -6,7 +6,7 @@ Company-intranet tools as a profile bundle: one patch layer inserting the [`dsh-
 
 ## What the patch mounts
 
-Two rows: the three wiki tools under `applyWriteApproval: ask` — every `intranet_wiki_apply_write` call routes through the approval seam and fails closed without one — and the read-only GitLab analysis tool under its defaults. The bundle carries no credential values: both packages default their references to `INTRANET_WIKI_BASE_URL` / `INTRANET_WIKI_TOKEN` and `INTRANET_GITLAB_BASE_URL` / `INTRANET_GITLAB_TOKEN`, resolved per call through the credentials service or the launching environment.
+Three rows: the three wiki tools under `applyWriteApproval: ask` — every `intranet_wiki_apply_write` call routes through the approval seam and fails closed without one — the read-only GitLab analysis tool under its defaults, and the [credentials card](../../client/ui-settings-intranet/README.md), which puts the four references on the web settings page. The bundle carries no credential values: both packages default their references to `INTRANET_WIKI_BASE_URL` / `INTRANET_WIKI_TOKEN` and `INTRANET_GITLAB_BASE_URL` / `INTRANET_GITLAB_TOKEN`, resolved per call through the credentials service or the launching environment.
 
 ## Using it
 

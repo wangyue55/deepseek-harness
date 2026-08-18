@@ -39,6 +39,7 @@
     }
   },
   "dependencies": {
+    "@deepseek-ai/dsh-client-ui-settings-intranet": "workspace:^",
     "@deepseek-ai/dsh-intranet-tool-gitlab": "workspace:^",
     "@deepseek-ai/dsh-intranet-tool-wiki": "workspace:^"
   },
