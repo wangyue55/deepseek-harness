@@ -307,6 +307,7 @@ const SCENARIOS: Scenario[] = [
     recorded: true,
     pinsHeader: true,
     headerClass: 'intranet-wiki',
+    systemPromptSource: 'product-subagent-codex',
     configPath: INTRANET_WIKI_CONFIG,
     env: {
       DSH_PERMISSION_MODE: 'workspace-write',
