@@ -39,6 +39,7 @@
 | `@deepseek-ai/dsh-tool-subagent-report` | `report` | `ctx.subagents`、`ctx.systemPrompt`、`a live continuable in-process child Agent` | `tool/call`、`tool/result`、`a user-role message in the direct parent session` | - | 按可继续的进程内子级注册，而非全局注册，因此该 schema 仅在这种子级内部可见，并且不受其全局 `toolFilter` 影响。同一份贡献还会安装子级作用域的 `tool:report` 系统提示词 section，本目录不渲染该 section。面向父级的 `send_message` 工具单独安装。 |
 | `@deepseek-ai/dsh-tool-jobs` | `job_kill`、`job_list`、`job_output` | `ctx.tools`、`ctx.jobs`、`ctx.systemPrompt` | `tool/call`、`tool/result`、`user/message via agent.inject() for background completion notices` | - | 与任务种类无关的后台任务控制器：后台 bash 命令、PTY 发送和 subagent 都通过相同的 3 个工具读取、列出和终止。加载该插件会挂接控制器，从而启用生产方的 `ctx.jobs.start()`。 |
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`、`owning Agent session` | `tool/call`、`todo/write`、`tool/result` | - | todo_write 是会话所有的状态；UI 将最新的 todo/write 事件渲染为检查清单。`allowParallelInProgress` 是没有默认值的必填项，因此本目录明确选择 `true`，对应描述允许同时存在多个 `in_progress` 项。选择 `false` 的部署会获得同一工具，但描述会要求只能有 1 个活动任务。 |
+| `@deepseek-ai/dsh-intranet-tool-wiki` | `intranet_wiki_apply_write`, `intranet_wiki_prepare_write`, `intranet_wiki_read_page` | `ctx.tools`, `credential references (default INTRANET_WIKI_BASE_URL / INTRANET_WIKI_TOKEN) resolved per call` | `tool/call`, `tool/result` | - | 不在 dsh-base 中:这些公司 Wiki 工具由 intranet bundle(`@deepseek-ai/dsh-intranet`)挂载。`applyWriteApproval` 必填且无默认值,目录声明其选择:`ask`,让每次 `intranet_wiki_apply_write` 调用经过审批接缝并在缺席时失败关闭;`allow` 直接执行。读取预算与超时是配置字段,默认值沿用迁移的 hydra-agent 生产值。 |
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`、`ctx.workflowEngine`、`ctx.systemPrompt`、`a calling Agent (exec.agent parents the script children)` | `tool/call`、`tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`、`web_search` | `ctx.tools`、`ctx.web`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | web_search 和 web_fetch 将提供方选择置于 ctx.web 之后，使模型可见 schema 在更换后端时保持稳定。 |
 
@@ -1732,6 +1733,154 @@ lsp 工具将提供方选择和语言服务器子进程置于 ctx.lsp 之后，�
 来源：[`packages/todo/tool-todo/src/index.ts`](../packages/todo/tool-todo/src/index.ts)
 
 todo_write 是会话所有的状态；UI 将最新的 todo/write 事件渲染为检查清单。`allowParallelInProgress` 是没有默认值的必填项，因此本目录明确选择 `true`，对应描述允许同时存在多个 `in_progress` 项。选择 `false` 的部署会获得同一工具，但描述会要求只能有 1 个活动任务。
+
+<a id="deepseek-aidsh-intranet-tool-wiki"></a>
+
+## `@deepseek-ai/dsh-intranet-tool-wiki`
+
+### `intranet_wiki_apply_write`
+
+将生成内容写入内网公司 Wiki 页面。这是高风险写入工具,只能在用户明确要求回写后使用。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "create_child creates a child page; append_page appends to an existing page",
+      "enum": [
+        "create_child",
+        "append_page"
+      ]
+    },
+    "parentPageId": {
+      "type": "string",
+      "description": "Parent wiki page id for create_child"
+    },
+    "pageId": {
+      "type": "string",
+      "description": "Target wiki page id for append_page"
+    },
+    "targetWikiUrl": {
+      "type": "string",
+      "description": "Target wiki URL containing pageId, alternative to pageId"
+    },
+    "title": {
+      "type": "string",
+      "description": "Child page title for create_child; optional heading label for append_page"
+    },
+    "contentMarkdown": {
+      "type": "string",
+      "description": "Full Markdown content to write. Must be the complete user-confirmed content, never a summary."
+    },
+    "baseVersion": {
+      "type": "integer",
+      "description": "Version number returned by the prepare step for append_page; the write fails if the current page version differs"
+    }
+  },
+  "required": [
+    "action",
+    "contentMarkdown"
+  ]
+}
+```
+
+来源:[`packages/intranet/tool-wiki/src/index.ts`](../packages/intranet/tool-wiki/src/index.ts)
+
+### `intranet_wiki_prepare_write`
+
+准备内网 Wiki 回写计划而不改动 Wiki。在把需求评审或生成的技术文档写入 Wiki 之前使用。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "create_child creates a child page; append_page appends to an existing page",
+      "enum": [
+        "create_child",
+        "append_page"
+      ]
+    },
+    "parentPageId": {
+      "type": "string",
+      "description": "Parent wiki page id for create_child"
+    },
+    "pageId": {
+      "type": "string",
+      "description": "Target wiki page id for append_page"
+    },
+    "targetWikiUrl": {
+      "type": "string",
+      "description": "Target wiki URL containing pageId, alternative to pageId"
+    },
+    "title": {
+      "type": "string",
+      "description": "Child page title for create_child; optional heading label for append_page"
+    },
+    "contentMarkdown": {
+      "type": "string",
+      "description": "Full Markdown content that would be written"
+    }
+  },
+  "required": [
+    "action",
+    "contentMarkdown"
+  ]
+}
+```
+
+来源:[`packages/intranet/tool-wiki/src/index.ts`](../packages/intranet/tool-wiki/src/index.ts)
+
+### `intranet_wiki_read_page`
+
+按 URL 或 pageId 读取内网公司 Wiki 页面。默认只读当前页;仅在用户明确要求子页面时使用 scope=descendants。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "url": {
+      "type": "string",
+      "description": "Intranet wiki page URL, usually containing pageId"
+    },
+    "pageId": {
+      "type": "string",
+      "description": "Wiki page id when URL is not provided"
+    },
+    "maxChars": {
+      "type": "integer",
+      "description": "Maximum text characters for the current scope, default 60000"
+    },
+    "scope": {
+      "type": "string",
+      "description": "Read only the current page (default) or the root page and its descendants",
+      "enum": [
+        "current",
+        "descendants"
+      ]
+    },
+    "maxDepth": {
+      "type": "integer",
+      "description": "Maximum descendant depth, default and maximum 10"
+    },
+    "maxPages": {
+      "type": "integer",
+      "description": "Maximum descendant pages, default 30 and maximum 100"
+    },
+    "maxCharsPerPage": {
+      "type": "integer",
+      "description": "Maximum text characters per page in descendants scope, default 20000"
+    }
+  }
+}
+```
+
+来源:[`packages/intranet/tool-wiki/src/index.ts`](../packages/intranet/tool-wiki/src/index.ts)
+
+Not in dsh-base: the intranet bundle (`@deepseek-ai/dsh-intranet`) mounts these company-wiki tools. `applyWriteApproval` is required with no default, so the catalog states its choice: `ask`, which routes every `intranet_wiki_apply_write` call through the approval seam and fails closed without one; `allow` executes directly. Read budgets and timeouts are config fields whose defaults mirror the migrated hydra-agent production values.
 
 <a id="deepseek-aidsh-tool-workflow"></a>
 

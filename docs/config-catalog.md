@@ -801,6 +801,56 @@ export interface Config {
 
 Source: [`packages/host/webserver/src/index.ts:45`](../packages/host/webserver/src/index.ts)
 
+<a id="deepseek-aidsh-intranet-tool-wiki"></a>
+
+## `@deepseek-ai/dsh-intranet-tool-wiki`
+
+Requires: `tools`
+
+```ts config-catalog
+/** Intranet wiki tool configuration; only the write policy has no default. */
+export interface Config {
+  /** Credential reference naming the wiki API base URL. */
+  baseUrlEnv?: string
+  /** Credential reference naming the wiki bearer token. */
+  tokenEnv?: string
+  /**
+   * Required deployment policy for `intranet_wiki_apply_write`: `ask` routes
+   * every call through the approval seam (and fails closed without one),
+   * `allow` executes without asking.
+   */
+  applyWriteApproval: 'ask' | 'allow'
+  /** Cooperative deadline for read-side calls, enforced by the timeout policy. */
+  readTimeoutMs?: number
+  /** Cooperative deadline for prepare/apply calls, enforced by the timeout policy. */
+  writeTimeoutMs?: number
+  /** Read budgets for page bodies and descendant walks. */
+  read?: ReadBudgetConfig
+}
+
+/** Read-budget configuration; omitted fields keep the hydra-agent production values. */
+export interface ReadBudgetConfig {
+  /** Current-page text budget applied when the model omits `maxChars`. */
+  defaultMaxChars?: number
+  /** Upper bound the model's `maxChars` is clamped to. */
+  maxChars?: number
+  /** Whole-call text budget across every page in `descendants` scope. */
+  totalMaxChars?: number
+  /** Deepest descendant level readable; also the default when omitted. */
+  maxDepth?: number
+  /** Descendant page count applied when the model omits `maxPages`. */
+  defaultMaxPages?: number
+  /** Upper bound the model's `maxPages` is clamped to. */
+  maxPages?: number
+  /** Per-page text budget applied when the model omits `maxCharsPerPage`. */
+  defaultMaxCharsPerPage?: number
+  /** Upper bound the model's `maxCharsPerPage` is clamped to. */
+  maxCharsPerPage?: number
+}
+```
+
+Source: [`packages/intranet/tool-wiki/src/index.ts:80`](../packages/intranet/tool-wiki/src/index.ts)
+
 <a id="deepseek-aidsh-invariants"></a>
 
 ## `@deepseek-ai/dsh-invariants`

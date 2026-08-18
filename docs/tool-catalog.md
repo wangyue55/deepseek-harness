@@ -37,6 +37,7 @@ This table connects model-visible tool names to the plugin package and service s
 | `@deepseek-ai/dsh-tool-subagent-report` | `report` | `ctx.subagents`, `ctx.systemPrompt`, `a live continuable in-process child Agent` | `tool/call`, `tool/result`, `a user-role message in the direct parent session` | - | Registered per continuable in-process child rather than globally, so this schema is visible only inside such a child and survives its global `toolFilter`. The same contribution installs the child-scoped `tool:report` prompt section, which this catalog does not render. The parent-facing `send_message` tool is installed independently. |
 | `@deepseek-ai/dsh-tool-jobs` | `job_kill`, `job_list`, `job_output` | `ctx.tools`, `ctx.jobs`, `ctx.systemPrompt` | `tool/call`, `tool/result`, `user/message via agent.inject() for background completion notices` | - | The kind-agnostic background-job controller: background bash commands, PTY sends, and subagents are read, listed, and killed through the same three tools. Loading the plugin attaches the controller that arms producers' `ctx.jobs.start()`. |
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`, `owning Agent session` | `tool/call`, `todo/write`, `tool/result` | - | todo_write is session-owned state; UIs render the latest todo/write event as a checklist. `allowParallelInProgress` is required with no default, so the catalog states its choice: `true`, whose description invites several `in_progress` items. A deployment choosing `false` receives the same tool with a description asking for exactly one active task. |
+| `@deepseek-ai/dsh-intranet-tool-wiki` | `intranet_wiki_apply_write`, `intranet_wiki_prepare_write`, `intranet_wiki_read_page` | `ctx.tools`, `credential references (default INTRANET_WIKI_BASE_URL / INTRANET_WIKI_TOKEN) resolved per call` | `tool/call`, `tool/result` | - | Not in dsh-base: the intranet bundle (`@deepseek-ai/dsh-intranet`) mounts these company-wiki tools. `applyWriteApproval` is required with no default, so the catalog states its choice: `ask`, which routes every `intranet_wiki_apply_write` call through the approval seam and fails closed without one; `allow` executes directly. Read budgets and timeouts are config fields whose defaults mirror the migrated hydra-agent production values. |
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`, `ctx.workflowEngine`, `ctx.systemPrompt`, `a calling Agent (exec.agent parents the script children)` | `tool/call`, `tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`, `web_search` | `ctx.tools`, `ctx.web`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | web_search and web_fetch keep provider selection behind ctx.web so model-visible schemas stay stable across backend swaps. |
 
@@ -1728,6 +1729,154 @@ Record and update a structured task list for the current work. Send the ENTIRE l
 Source: [`packages/todo/tool-todo/src/index.ts`](../packages/todo/tool-todo/src/index.ts)
 
 todo_write is session-owned state; UIs render the latest todo/write event as a checklist. `allowParallelInProgress` is required with no default, so the catalog states its choice: `true`, whose description invites several `in_progress` items. A deployment choosing `false` receives the same tool with a description asking for exactly one active task.
+
+<a id="deepseek-aidsh-intranet-tool-wiki"></a>
+
+## `@deepseek-ai/dsh-intranet-tool-wiki`
+
+### `intranet_wiki_apply_write`
+
+Write generated content to an intranet company wiki page. This is a high-risk write tool and must only be used after the user explicitly asks to write back.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "create_child creates a child page; append_page appends to an existing page",
+      "enum": [
+        "create_child",
+        "append_page"
+      ]
+    },
+    "parentPageId": {
+      "type": "string",
+      "description": "Parent wiki page id for create_child"
+    },
+    "pageId": {
+      "type": "string",
+      "description": "Target wiki page id for append_page"
+    },
+    "targetWikiUrl": {
+      "type": "string",
+      "description": "Target wiki URL containing pageId, alternative to pageId"
+    },
+    "title": {
+      "type": "string",
+      "description": "Child page title for create_child; optional heading label for append_page"
+    },
+    "contentMarkdown": {
+      "type": "string",
+      "description": "Full Markdown content to write. Must be the complete user-confirmed content, never a summary."
+    },
+    "baseVersion": {
+      "type": "integer",
+      "description": "Version number returned by the prepare step for append_page; the write fails if the current page version differs"
+    }
+  },
+  "required": [
+    "action",
+    "contentMarkdown"
+  ]
+}
+```
+
+Source: [`packages/intranet/tool-wiki/src/index.ts`](../packages/intranet/tool-wiki/src/index.ts)
+
+### `intranet_wiki_prepare_write`
+
+Prepare an intranet wiki write-back plan without changing the wiki. Use before writing requirement review or generated technical documents to the wiki.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "create_child creates a child page; append_page appends to an existing page",
+      "enum": [
+        "create_child",
+        "append_page"
+      ]
+    },
+    "parentPageId": {
+      "type": "string",
+      "description": "Parent wiki page id for create_child"
+    },
+    "pageId": {
+      "type": "string",
+      "description": "Target wiki page id for append_page"
+    },
+    "targetWikiUrl": {
+      "type": "string",
+      "description": "Target wiki URL containing pageId, alternative to pageId"
+    },
+    "title": {
+      "type": "string",
+      "description": "Child page title for create_child; optional heading label for append_page"
+    },
+    "contentMarkdown": {
+      "type": "string",
+      "description": "Full Markdown content that would be written"
+    }
+  },
+  "required": [
+    "action",
+    "contentMarkdown"
+  ]
+}
+```
+
+Source: [`packages/intranet/tool-wiki/src/index.ts`](../packages/intranet/tool-wiki/src/index.ts)
+
+### `intranet_wiki_read_page`
+
+Read an intranet company wiki page by URL or pageId. By default reads only the current page; use scope=descendants only when the user explicitly requests child pages.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "url": {
+      "type": "string",
+      "description": "Intranet wiki page URL, usually containing pageId"
+    },
+    "pageId": {
+      "type": "string",
+      "description": "Wiki page id when URL is not provided"
+    },
+    "maxChars": {
+      "type": "integer",
+      "description": "Maximum text characters for the current scope, default 60000"
+    },
+    "scope": {
+      "type": "string",
+      "description": "Read only the current page (default) or the root page and its descendants",
+      "enum": [
+        "current",
+        "descendants"
+      ]
+    },
+    "maxDepth": {
+      "type": "integer",
+      "description": "Maximum descendant depth, default and maximum 10"
+    },
+    "maxPages": {
+      "type": "integer",
+      "description": "Maximum descendant pages, default 30 and maximum 100"
+    },
+    "maxCharsPerPage": {
+      "type": "integer",
+      "description": "Maximum text characters per page in descendants scope, default 20000"
+    }
+  }
+}
+```
+
+Source: [`packages/intranet/tool-wiki/src/index.ts`](../packages/intranet/tool-wiki/src/index.ts)
+
+Not in dsh-base: the intranet bundle (`@deepseek-ai/dsh-intranet`) mounts these company-wiki tools. `applyWriteApproval` is required with no default, so the catalog states its choice: `ask`, which routes every `intranet_wiki_apply_write` call through the approval seam and fails closed without one; `allow` executes directly. Read budgets and timeouts are config fields whose defaults mirror the migrated hydra-agent production values.
 
 <a id="deepseek-aidsh-tool-workflow"></a>
 
