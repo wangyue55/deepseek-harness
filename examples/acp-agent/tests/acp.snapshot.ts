@@ -305,8 +305,11 @@ const SCENARIOS: Scenario[] = [
     name: 'intranet-wiki',
     hasModelTurn: true,
     recorded: true,
+    pinsHeader: true,
+    headerClass: 'intranet-wiki',
     configPath: INTRANET_WIKI_CONFIG,
     env: {
+      DSH_PERMISSION_MODE: 'workspace-write',
       INTRANET_WIKI_SNAPSHOT_BASE_URL: 'http://127.0.0.1:43121',
       INTRANET_WIKI_SNAPSHOT_TOKEN: 'snapshot-token',
     },
