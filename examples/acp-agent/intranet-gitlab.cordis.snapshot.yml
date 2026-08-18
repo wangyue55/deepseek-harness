@@ -1,0 +1,29 @@
+# Keyless replay counterpart to intranet-gitlab.cordis.yml: the analysis tool
+# and loopback fixture server stay real (the tool call re-executes the actual
+# HTTP resolution, probes, and reads against the fixture); only the model
+# adapter is replaced by replay.
+- id: base
+  name: '@deepseek-ai/cordis-plugin-include'
+  config:
+    path: ./cordis.yml
+    patches:
+      - id: llm-deepseek
+        name: '@deepseek-ai/dsh-llm-deepseek'
+        disabled: true
+      - insert:
+          - id: intranet-gitlab-fixture
+            name: './intranet-gitlab-fixture-server.mjs'
+          - id: intranet-tool-gitlab
+            name: '@deepseek-ai/dsh-intranet-tool-gitlab'
+            config:
+              baseUrlEnv: INTRANET_GITLAB_SNAPSHOT_BASE_URL
+              tokenEnv: INTRANET_GITLAB_SNAPSHOT_TOKEN
+          - id: llm-replay
+            name: '@deepseek-ai/dsh-llm-replay'
+            config:
+              providers:
+                - id: deepseek-official
+                  name: DeepSeek
+                  models:
+                    - id: deepseek-v4-flash
+                    - id: deepseek-v4-pro

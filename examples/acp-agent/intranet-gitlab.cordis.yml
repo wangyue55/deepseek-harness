@@ -1,0 +1,17 @@
+# Intranet-gitlab composition for the intranet-gitlab snapshot scenario: the
+# read-only analysis tool plus the loopback GitLab fixture the prompt analyzes
+# against — deterministic content, no company network, in recording and replay
+# alike. The scenario row supplies the credential reference values via env.
+- id: base
+  name: '@deepseek-ai/cordis-plugin-include'
+  config:
+    path: ./cordis.yml
+    patches:
+      - insert:
+          - id: intranet-gitlab-fixture
+            name: './intranet-gitlab-fixture-server.mjs'
+          - id: intranet-tool-gitlab
+            name: '@deepseek-ai/dsh-intranet-tool-gitlab'
+            config:
+              baseUrlEnv: INTRANET_GITLAB_SNAPSHOT_BASE_URL
+              tokenEnv: INTRANET_GITLAB_SNAPSHOT_TOKEN

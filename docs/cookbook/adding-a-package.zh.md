@@ -30,7 +30,7 @@ package.json 不变式（由 `pnpm run constraints` / `scripts/check-workspace-c
 
 | 文件 | 变更 |
 |---|---|
-| `tsconfig.base.json` | 已有分组无需编辑；新分组需为 `@deepseek-ai/dsh-*` 通配符添加 `./packages/<group>/*/src` 候选路径 |
+| `tsconfig.base.json` | 已有分组无需编辑；新分组需为 `@deepseek-ai/dsh-*` 通配符添加 `./packages/<group>/*/src` 候选路径。该候选只能映射目录名等于 npm 短名的包；npm 名前缀了分组目录的分组（`dsh-<group>-<dir>`）改为添加专用的 `@deepseek-ai/dsh-<group>-*` 通配符对——见 host/client/intranet 条目 |
 | `tsconfig.host.json`（Host 包）或 `tsconfig.client.json`（Client 包） | 在 `references` 中添加 `{ "path": "./packages/<group>/<pkg>" }`——普通包恰好属于一个 aggregate，绝不两个都加。`api/remotes` 因 Host 生成约定与 Client 消费约定之间存在顺序依赖而使用仓库专属拆分，新增包不得仿照（[布局](../development.md#typescript-project-layout)） |
 | `knip.json` | 仅当包有仓库发现机制尚未覆盖的入口时需要 |
 

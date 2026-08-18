@@ -58,6 +58,8 @@ import * as ToolSkill from '@deepseek-ai/dsh-tool-skill'
 import * as ToolSessionQuery from '@deepseek-ai/dsh-tool-session-query'
 import * as ToolTasks from '@deepseek-ai/dsh-tool-jobs'
 import * as ToolTodo from '@deepseek-ai/dsh-tool-todo'
+import * as ToolIntranetWiki from '@deepseek-ai/dsh-intranet-tool-wiki'
+import * as ToolIntranetGitlab from '@deepseek-ai/dsh-intranet-tool-gitlab'
 import * as ToolSubagent from '@deepseek-ai/dsh-tool-subagent'
 import * as ToolWeb from '@deepseek-ai/dsh-tool-web'
 import VmWorkflowEngine from '@deepseek-ai/dsh-workflow-worker-thread'
@@ -517,6 +519,30 @@ const TOOL_PACKAGES: ToolPackage[] = [
     },
     note:
       'todo_write is session-owned state; UIs render the latest todo/write event as a checklist. `allowParallelInProgress` is required with no default, so the catalog states its choice: `true`, whose description invites several `in_progress` items. A deployment choosing `false` receives the same tool with a description asking for exactly one active task.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-intranet-tool-wiki',
+    dir: 'tool-wiki',
+    source: 'packages/intranet/tool-wiki/src/index.ts',
+    requires: ['ctx.tools', 'credential references (default INTRANET_WIKI_BASE_URL / INTRANET_WIKI_TOKEN) resolved per call'],
+    writes: ['tool/call', 'tool/result'],
+    async mount(ctx) {
+      await ctx.plugin(ToolIntranetWiki, { applyWriteApproval: 'ask' })
+    },
+    note:
+      'Not in dsh-base: the intranet bundle (`@deepseek-ai/dsh-intranet`) mounts these company-wiki tools. `applyWriteApproval` is required with no default, so the catalog states its choice: `ask`, which routes every `intranet_wiki_apply_write` call through the approval seam and fails closed without one; `allow` executes directly. Read budgets and timeouts are config fields whose defaults mirror the migrated hydra-agent production values.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-intranet-tool-gitlab',
+    dir: 'tool-gitlab',
+    source: 'packages/intranet/tool-gitlab/src/index.ts',
+    requires: ['ctx.tools', 'credential references (default INTRANET_GITLAB_BASE_URL / INTRANET_GITLAB_TOKEN) resolved per call'],
+    writes: ['tool/call', 'tool/result'],
+    async mount(ctx) {
+      await ctx.plugin(ToolIntranetGitlab, {})
+    },
+    note:
+      'Not in dsh-base: the intranet bundle (`@deepseek-ai/dsh-intranet`) mounts this company-GitLab analysis tool. Every config field has a default mirroring the migrated hydra-agent production values; discovery and read budgets are config fields, and the read-only analysis rejects a call naming neither code paths nor requirement clues.',
   },
   {
     pkg: '@deepseek-ai/dsh-tool-workflow',

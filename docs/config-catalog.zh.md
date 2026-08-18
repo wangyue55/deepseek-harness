@@ -803,6 +803,108 @@ export interface Config {
 
 来源：[`packages/host/webserver/src/index.ts:45`](../packages/host/webserver/src/index.ts)
 
+<a id="deepseek-aidsh-intranet-tool-gitlab"></a>
+
+## `@deepseek-ai/dsh-intranet-tool-gitlab`
+
+需要:`tools`
+
+```ts config-catalog
+/** Intranet GitLab tool configuration; every field has a default. */
+export interface Config {
+  /** Credential reference naming the GitLab API base URL. */
+  baseUrlEnv?: string
+  /** Credential reference naming the GitLab private token. */
+  tokenEnv?: string
+  /** Cooperative deadline enforced by the timeout policy. */
+  timeoutMs?: number
+  /** Cap on each hint array after de-duplication. */
+  hintLimit?: number
+  /** Clue-search budgets. */
+  discovery?: DiscoveryBudgetConfig
+  /** Source-acquisition budgets. */
+  read?: ReadBudgetConfig
+}
+
+/** Discovery-budget configuration; omitted fields keep the hydra-agent production values. */
+export interface DiscoveryBudgetConfig {
+  /** Maximum distinct hint queries searched. */
+  maxQueries?: number
+  /** Blob-search page size. */
+  searchPerPage?: number
+  /** Blob-search pages per query before truncation. */
+  searchMaxPages?: number
+  /** Maximum matched files whose content is probed for evidence. */
+  maxCandidateFiles?: number
+  /** Maximum discovered paths reported. */
+  maxDiscoveredPaths?: number
+}
+
+/** Read-budget configuration; omitted fields keep the hydra-agent production values. */
+export interface ReadBudgetConfig {
+  /** Maximum files read across every path. */
+  maxFiles?: number
+  /** Per-file character cap; larger files are skipped. */
+  maxFileChars?: number
+  /** Whole-call character cap; later files are skipped once reached. */
+  maxTotalChars?: number
+  /** Concurrent raw-file reads. */
+  readConcurrency?: number
+}
+```
+
+来源:[`packages/intranet/tool-gitlab/src/index.ts:96`](../packages/intranet/tool-gitlab/src/index.ts)
+
+<a id="deepseek-aidsh-intranet-tool-wiki"></a>
+
+## `@deepseek-ai/dsh-intranet-tool-wiki`
+
+需要:`tools`
+
+```ts config-catalog
+/** Intranet wiki tool configuration; only the write policy has no default. */
+export interface Config {
+  /** Credential reference naming the wiki API base URL. */
+  baseUrlEnv?: string
+  /** Credential reference naming the wiki bearer token. */
+  tokenEnv?: string
+  /**
+   * Required deployment policy for `intranet_wiki_apply_write`: `ask` routes
+   * every call through the approval seam (and fails closed without one),
+   * `allow` executes without asking.
+   */
+  applyWriteApproval: 'ask' | 'allow'
+  /** Cooperative deadline for read-side calls, enforced by the timeout policy. */
+  readTimeoutMs?: number
+  /** Cooperative deadline for prepare/apply calls, enforced by the timeout policy. */
+  writeTimeoutMs?: number
+  /** Read budgets for page bodies and descendant walks. */
+  read?: ReadBudgetConfig
+}
+
+/** Read-budget configuration; omitted fields keep the hydra-agent production values. */
+export interface ReadBudgetConfig {
+  /** Current-page text budget applied when the model omits `maxChars`. */
+  defaultMaxChars?: number
+  /** Upper bound the model's `maxChars` is clamped to. */
+  maxChars?: number
+  /** Whole-call text budget across every page in `descendants` scope. */
+  totalMaxChars?: number
+  /** Deepest descendant level readable; also the default when omitted. */
+  maxDepth?: number
+  /** Descendant page count applied when the model omits `maxPages`. */
+  defaultMaxPages?: number
+  /** Upper bound the model's `maxPages` is clamped to. */
+  maxPages?: number
+  /** Per-page text budget applied when the model omits `maxCharsPerPage`. */
+  defaultMaxCharsPerPage?: number
+  /** Upper bound the model's `maxCharsPerPage` is clamped to. */
+  maxCharsPerPage?: number
+}
+```
+
+来源:[`packages/intranet/tool-wiki/src/index.ts:80`](../packages/intranet/tool-wiki/src/index.ts)
+
 <a id="deepseek-aidsh-invariants"></a>
 
 ## `@deepseek-ai/dsh-invariants`
@@ -3133,6 +3235,7 @@ export interface Config {
 - `@deepseek-ai/dsh-cmdline`（[`packages/boot/cmdline/src/index.ts`](../packages/boot/cmdline/src/index.ts)）
 - `@deepseek-ai/dsh-home-paths`（[`packages/util/home-paths/src/index.ts`](../packages/util/home-paths/src/index.ts)）
 - `@deepseek-ai/dsh-hook-protocol`（[`packages/hooks/hook-protocol/src/index.ts`](../packages/hooks/hook-protocol/src/index.ts)）
+- `@deepseek-ai/dsh-intranet`（[`packages/bundle/intranet/src/index.ts`](../packages/bundle/intranet/src/index.ts)）
 - `@deepseek-ai/dsh-launch-environment`（[`packages/util/launch-environment/src/index.ts`](../packages/util/launch-environment/src/index.ts)）
 - `@deepseek-ai/dsh-llm-mock-server`（[`packages/test-support/llm-mock-server/src/index.ts`](../packages/test-support/llm-mock-server/src/index.ts)）
 - `@deepseek-ai/dsh-loader-smoke`（[`packages/test-support/loader-smoke/src/index.ts`](../packages/test-support/loader-smoke/src/index.ts)）

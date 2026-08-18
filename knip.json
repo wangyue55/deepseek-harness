@@ -120,6 +120,26 @@
         "tests/**/*.{ts,tsx}"
       ]
     },
+    "packages/intranet/tool-wiki": {
+      "entry": [
+        "tests/**/*.spec.{ts,tsx}",
+        "tests/**/*.e2e.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "tests/**/*.{ts,tsx}"
+      ]
+    },
+    "packages/intranet/tool-gitlab": {
+      "entry": [
+        "tests/**/*.spec.{ts,tsx}",
+        "tests/**/*.e2e.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "tests/**/*.{ts,tsx}"
+      ]
+    },
     "packages/client/web-ui": {
       "entry": [
         "tests/**/*.spec.{ts,tsx}"
@@ -776,6 +796,11 @@
     "packages/bundle/headless": {
       "ignoreDependencies": [
         "@deepseek-ai/dsh-code-runtime-worker-thread"
+      ]
+    },
+    "packages/bundle/intranet": {
+      "ignoreDependencies": [
+        "@deepseek-ai/.+"
       ]
     },
     "packages/bundle/web-app": {

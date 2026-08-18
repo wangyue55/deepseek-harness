@@ -1,0 +1,19 @@
+{
+  "steps": [
+    {
+      "op": "initialize"
+    },
+    {
+      "op": "newSession"
+    },
+    {
+      "op": "prompt",
+      "text": "Use the intranet wiki tools in exactly three calls. First call intranet_wiki_read_page for http://127.0.0.1:43121/pages/viewpage.action?pageId=9001. Second call intranet_wiki_prepare_write with action create_child, parentPageId 9001, title 'Review Notes', and contentMarkdown exactly '# Review\\n\\n- ok'. Third call intranet_wiki_apply_write with the same action, parentPageId, title, and contentMarkdown. I approve the write. After the third result, reply with the single word DONE and stop."
+    }
+  ],
+  "permissionAnswers": [
+    {
+      "kind": "allow_once"
+    }
+  ]
+}
