@@ -74,7 +74,8 @@ function extractProjectPathFromUrl(value: string, baseUrl: string): string | nul
   const basePath = configuredUrl.pathname.replace(/^\/+|\/+$/g, '')
   path = path.replace(/^\/+/, '')
   if (basePath && path.startsWith(`${basePath}/`)) path = path.slice(basePath.length + 1)
-  path = path.split('/-/', 1)[0] ?? path
+  // A split never yields an empty array, so the first segment exists.
+  path = path.split('/-/', 1)[0] as string
   return normalizeLocator(path)
 }
 

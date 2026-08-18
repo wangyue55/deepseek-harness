@@ -107,8 +107,8 @@ function summarizeFile(file: CodeFile): CodeAnalysisResult['files'][number] {
 /** Static and CommonJS import specifiers, capped at 40. */
 function extractImports(content: string): string[] {
   const imports = [
-    ...Array.from(content.matchAll(/import\s+[^'"]*from\s+["']([^"']+)["']/g)).map(m => m[1] ?? ''),
-    ...Array.from(content.matchAll(/require\(["']([^"']+)["']\)/g)).map(m => m[1] ?? ''),
+    ...Array.from(content.matchAll(/import\s+[^'"]*from\s+["']([^"']+)["']/g)).map(m => group(m, 1)),
+    ...Array.from(content.matchAll(/require\(["']([^"']+)["']\)/g)).map(m => group(m, 1)),
   ]
   return unique(imports).slice(0, 40)
 }
@@ -118,16 +118,16 @@ function extractExports(content: string): string[] {
   return unique(
     Array.from(
       content.matchAll(/export\s+(?:default\s+)?(?:class|function|const|interface|type)\s+([A-Za-z0-9_]+)/g),
-    ).map(m => m[1] ?? ''),
+    ).map(m => group(m, 1)),
   ).slice(0, 40)
 }
 
 /** Declared classes/functions/types, constant names, and `name:` literals, capped at 40. */
 function extractSymbols(content: string, path: string): string[] {
   const symbols = [
-    ...Array.from(content.matchAll(/\b(?:class|function|interface|type)\s+([A-Za-z0-9_]+)/g)).map(m => m[1] ?? ''),
-    ...Array.from(content.matchAll(/\bconst\s+([A-Z][A-Za-z0-9_]*)\s*=/g)).map(m => m[1] ?? ''),
-    ...Array.from(content.matchAll(/name:\s*["']([^"']+)["']/g)).map(m => m[1] ?? ''),
+    ...Array.from(content.matchAll(/\b(?:class|function|interface|type)\s+([A-Za-z0-9_]+)/g)).map(m => group(m, 1)),
+    ...Array.from(content.matchAll(/\bconst\s+([A-Z][A-Za-z0-9_]*)\s*=/g)).map(m => group(m, 1)),
+    ...Array.from(content.matchAll(/name:\s*["']([^"']+)["']/g)).map(m => group(m, 1)),
   ]
   if (symbols.length === 0 && path.endsWith('.vue')) symbols.push(basename(path))
   return unique(symbols).slice(0, 40)
@@ -136,8 +136,8 @@ function extractSymbols(content: string, path: string): string[] {
 /** Fetch/axios/request targets and `url:` literals, capped at 60. */
 function extractApiCalls(content: string): string[] {
   const calls = [
-    ...Array.from(content.matchAll(/\b(?:fetch|axios\.\w+|request)\(\s*["'`]([^"'`]+)["'`]/g)).map(m => m[1] ?? ''),
-    ...Array.from(content.matchAll(/\burl\s*:\s*["']([^"']+)["']/g)).map(m => m[1] ?? ''),
+    ...Array.from(content.matchAll(/\b(?:fetch|axios\.\w+|request)\(\s*["'`]([^"'`]+)["'`]/g)).map(m => group(m, 1)),
+    ...Array.from(content.matchAll(/\burl\s*:\s*["']([^"']+)["']/g)).map(m => group(m, 1)),
   ]
   return unique(calls).slice(0, 60)
 }
@@ -146,9 +146,9 @@ function extractApiCalls(content: string): string[] {
 function extractRoutes(content: string): string[] {
   const routes = [
     ...Array.from(content.matchAll(/@(Get|Post|Put|Delete|Patch)\(["']?([^"')`]*)["']?\)/g)).map(
-      m => `${(m[1] ?? '').toUpperCase()} /${m[2] ?? ''}`.replace(/\/+$/, ''),
+      m => `${group(m, 1).toUpperCase()} /${group(m, 2)}`.replace(/\/+$/, ''),
     ),
-    ...Array.from(content.matchAll(/\bpath\s*:\s*["']([^"']+)["']/g)).map(m => m[1] ?? ''),
+    ...Array.from(content.matchAll(/\bpath\s*:\s*["']([^"']+)["']/g)).map(m => group(m, 1)),
   ]
   return unique(routes).slice(0, 60)
 }
@@ -161,6 +161,11 @@ function inferSideEffects(apiCalls: string[], routes: string[]): string[] {
   return effects
 }
 
+/** A matched regex's capture group; the patterns above always bind their groups. */
+function group(match: RegExpMatchArray, index: number): string {
+  return match[index] as string
+}
+
 /** Trimmed, de-duplicated, non-empty values in first-seen order. */
 function unique(values: string[]): string[] {
   return Array.from(new Set(values.map(v => v.trim()).filter(Boolean)))
@@ -168,5 +173,7 @@ function unique(values: string[]): string[] {
 
 /** Extensionless basename of a path. */
 function basename(path: string): string {
-  return path.split(/[\\/]/).pop()?.replace(/\.[^.]+$/, '') ?? path
+  const segments = path.split(/[\\/]/)
+  // A split never yields an empty array, so the last segment exists.
+  return (segments[segments.length - 1] as string).replace(/\.[^.]+$/, '')
 }

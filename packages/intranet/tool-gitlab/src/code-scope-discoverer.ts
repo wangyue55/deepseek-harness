@@ -144,6 +144,7 @@ export class CodeScopeDiscoverer {
 
     for (const file of contents) {
       if (file.content === null) continue
+      /* v8 ignore next -- candidates only exist when queries ran, so the pattern is non-null here. */
       const isHintMatch = hintPattern?.test(file.content) ?? false
       if (!isHintMatch) continue
       candidateSet.add(file.path)
@@ -186,7 +187,8 @@ export class CodeScopeDiscoverer {
 function extractImports(content: string, sourcePath: string): string[] {
   const result: string[] = []
   for (const match of content.matchAll(/import\(\s*["']([^"']+)["']\s*\)/g)) {
-    const value = match[1] ?? ''
+    // The pattern always binds its group on a match.
+    const value = match[1] as string
     if (!value.startsWith('.')) continue
     const resolved = posix.normalize(posix.join(posix.dirname(sourcePath), value))
     if (/\.(vue|tsx?|jsx?)$/.test(resolved)) result.push(resolved)
@@ -198,7 +200,7 @@ function extractImports(content: string, sourcePath: string): string[] {
 function extractMarkdownReferences(content: string): string[] {
   const paths: string[] = []
   for (const match of content.matchAll(/\[[^\]]*\]\(([^)]+\.md)\)/gi)) {
-    const rawPath = (match[1] ?? '').trim()
+    const rawPath = (match[1] as string).trim()
     if (!rawPath || rawPath.includes('..') || /^https?:/i.test(rawPath) || posix.isAbsolute(rawPath)) continue
     paths.push(normalizePath(rawPath))
   }
