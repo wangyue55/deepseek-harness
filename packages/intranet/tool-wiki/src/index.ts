@@ -24,32 +24,64 @@ export type * from './types.ts'
 export const name = 'intranet-tool-wiki'
 export const inject = ['tools']
 
-/** Read-budget configuration; defaults mirror the hydra-agent production values. */
-export interface ReadBudgetConfig {
-  /** Current-page text budget applied when the model omits `maxChars`. */
+/** Default credential reference naming the wiki API base URL. */
+const DEFAULT_BASE_URL_ENV = 'INTRANET_WIKI_BASE_URL'
+/** Default credential reference naming the wiki bearer token. */
+const DEFAULT_TOKEN_ENV = 'INTRANET_WIKI_TOKEN'
+/** Default cooperative deadline for read-side calls, in milliseconds. */
+const DEFAULT_READ_TIMEOUT_MS = 60000
+/** Default cooperative deadline for prepare/apply calls, in milliseconds. */
+const DEFAULT_WRITE_TIMEOUT_MS = 30000
+/** Fully resolved read budgets every read call computes against. */
+interface ResolvedReadBudgets {
   defaultMaxChars: number
-  /** Upper bound the model's `maxChars` is clamped to. */
   maxChars: number
-  /** Whole-call text budget across every page in `descendants` scope. */
   totalMaxChars: number
-  /** Deepest descendant level readable; also the default when omitted. */
   maxDepth: number
-  /** Descendant page count applied when the model omits `maxPages`. */
   defaultMaxPages: number
-  /** Upper bound the model's `maxPages` is clamped to. */
   maxPages: number
-  /** Per-page text budget applied when the model omits `maxCharsPerPage`. */
   defaultMaxCharsPerPage: number
-  /** Upper bound the model's `maxCharsPerPage` is clamped to. */
   maxCharsPerPage: number
 }
 
-/** Intranet wiki tool configuration. */
+/** Default read budgets; the values mirror the hydra-agent production defaults. */
+const DEFAULT_READ_BUDGETS: ResolvedReadBudgets = {
+  defaultMaxChars: 60000,
+  maxChars: 100000,
+  totalMaxChars: 150000,
+  maxDepth: 10,
+  defaultMaxPages: 30,
+  maxPages: 100,
+  defaultMaxCharsPerPage: 20000,
+  maxCharsPerPage: 60000,
+}
+
+/** Read-budget configuration; omitted fields keep the hydra-agent production values. */
+export interface ReadBudgetConfig {
+  /** Current-page text budget applied when the model omits `maxChars`. */
+  defaultMaxChars?: number
+  /** Upper bound the model's `maxChars` is clamped to. */
+  maxChars?: number
+  /** Whole-call text budget across every page in `descendants` scope. */
+  totalMaxChars?: number
+  /** Deepest descendant level readable; also the default when omitted. */
+  maxDepth?: number
+  /** Descendant page count applied when the model omits `maxPages`. */
+  defaultMaxPages?: number
+  /** Upper bound the model's `maxPages` is clamped to. */
+  maxPages?: number
+  /** Per-page text budget applied when the model omits `maxCharsPerPage`. */
+  defaultMaxCharsPerPage?: number
+  /** Upper bound the model's `maxCharsPerPage` is clamped to. */
+  maxCharsPerPage?: number
+}
+
+/** Intranet wiki tool configuration; only the write policy has no default. */
 export interface Config {
   /** Credential reference naming the wiki API base URL. */
-  baseUrlEnv: string
+  baseUrlEnv?: string
   /** Credential reference naming the wiki bearer token. */
-  tokenEnv: string
+  tokenEnv?: string
   /**
    * Required deployment policy for `intranet_wiki_apply_write`: `ask` routes
    * every call through the approval seam (and fails closed without one),
@@ -57,31 +89,71 @@ export interface Config {
    */
   applyWriteApproval: 'ask' | 'allow'
   /** Cooperative deadline for read-side calls, enforced by the timeout policy. */
-  readTimeoutMs: number
+  readTimeoutMs?: number
   /** Cooperative deadline for prepare/apply calls, enforced by the timeout policy. */
-  writeTimeoutMs: number
+  writeTimeoutMs?: number
   /** Read budgets for page bodies and descendant walks. */
-  read: ReadBudgetConfig
+  read?: ReadBudgetConfig
 }
 
-/** Schemastery configuration for the intranet wiki tool consumer. */
+/**
+ * Schemastery configuration for the intranet wiki tool consumer. Defaults are
+ * declared here as well as in {@link resolveConfig} so configuration surfaces
+ * render the resolved section; both read the same constants.
+ */
 export const Config: z<Config> = z.object({
-  baseUrlEnv: z.string().role('credential-ref').default('INTRANET_WIKI_BASE_URL'),
-  tokenEnv: z.string().role('credential-ref').default('INTRANET_WIKI_TOKEN'),
+  baseUrlEnv: z.string().role('credential-ref').default(DEFAULT_BASE_URL_ENV),
+  tokenEnv: z.string().role('credential-ref').default(DEFAULT_TOKEN_ENV),
   applyWriteApproval: z.union(['ask', 'allow'] as const).required(),
-  readTimeoutMs: z.number().step(1).min(1).default(60000),
-  writeTimeoutMs: z.number().step(1).min(1).default(30000),
+  readTimeoutMs: z.number().step(1).min(1).default(DEFAULT_READ_TIMEOUT_MS),
+  writeTimeoutMs: z.number().step(1).min(1).default(DEFAULT_WRITE_TIMEOUT_MS),
   read: z.object({
-    defaultMaxChars: z.number().step(1).min(1).default(60000),
-    maxChars: z.number().step(1).min(1).default(100000),
-    totalMaxChars: z.number().step(1).min(1).default(150000),
-    maxDepth: z.number().step(1).min(1).default(10),
-    defaultMaxPages: z.number().step(1).min(1).default(30),
-    maxPages: z.number().step(1).min(1).default(100),
-    defaultMaxCharsPerPage: z.number().step(1).min(1).default(20000),
-    maxCharsPerPage: z.number().step(1).min(1).default(60000),
+    defaultMaxChars: z.number().step(1).min(1).default(DEFAULT_READ_BUDGETS.defaultMaxChars),
+    maxChars: z.number().step(1).min(1).default(DEFAULT_READ_BUDGETS.maxChars),
+    totalMaxChars: z.number().step(1).min(1).default(DEFAULT_READ_BUDGETS.totalMaxChars),
+    maxDepth: z.number().step(1).min(1).default(DEFAULT_READ_BUDGETS.maxDepth),
+    defaultMaxPages: z.number().step(1).min(1).default(DEFAULT_READ_BUDGETS.defaultMaxPages),
+    maxPages: z.number().step(1).min(1).default(DEFAULT_READ_BUDGETS.maxPages),
+    defaultMaxCharsPerPage: z.number().step(1).min(1).default(DEFAULT_READ_BUDGETS.defaultMaxCharsPerPage),
+    maxCharsPerPage: z.number().step(1).min(1).default(DEFAULT_READ_BUDGETS.maxCharsPerPage),
   }),
 })
+
+/** Fully resolved configuration every tool body reads. */
+interface ResolvedConfig {
+  baseUrlEnv: string
+  tokenEnv: string
+  applyWriteApproval: 'ask' | 'allow'
+  readTimeoutMs: number
+  writeTimeoutMs: number
+  read: ResolvedReadBudgets
+}
+
+/**
+ * Resolve the raw plugin config into the values the tools run with; every
+ * default lives in the module constants the schema also declares.
+ * @param config - raw plugin config.
+ * @returns the resolved configuration.
+ */
+function resolveConfig(config: Config): ResolvedConfig {
+  return {
+    baseUrlEnv: config.baseUrlEnv ?? DEFAULT_BASE_URL_ENV,
+    tokenEnv: config.tokenEnv ?? DEFAULT_TOKEN_ENV,
+    applyWriteApproval: config.applyWriteApproval,
+    readTimeoutMs: config.readTimeoutMs ?? DEFAULT_READ_TIMEOUT_MS,
+    writeTimeoutMs: config.writeTimeoutMs ?? DEFAULT_WRITE_TIMEOUT_MS,
+    read: {
+      defaultMaxChars: config.read?.defaultMaxChars ?? DEFAULT_READ_BUDGETS.defaultMaxChars,
+      maxChars: config.read?.maxChars ?? DEFAULT_READ_BUDGETS.maxChars,
+      totalMaxChars: config.read?.totalMaxChars ?? DEFAULT_READ_BUDGETS.totalMaxChars,
+      maxDepth: config.read?.maxDepth ?? DEFAULT_READ_BUDGETS.maxDepth,
+      defaultMaxPages: config.read?.defaultMaxPages ?? DEFAULT_READ_BUDGETS.defaultMaxPages,
+      maxPages: config.read?.maxPages ?? DEFAULT_READ_BUDGETS.maxPages,
+      defaultMaxCharsPerPage: config.read?.defaultMaxCharsPerPage ?? DEFAULT_READ_BUDGETS.defaultMaxCharsPerPage,
+      maxCharsPerPage: config.read?.maxCharsPerPage ?? DEFAULT_READ_BUDGETS.maxCharsPerPage,
+    },
+  }
+}
 
 /** Registered name of the write tool, shared with the approval gate. */
 const APPLY_WRITE_NAME = 'intranet_wiki_apply_write'
@@ -96,15 +168,15 @@ const WRITE_ACTIONS = ['create_child', 'append_page'] as const
 const DEFAULT_APPEND_TITLE = 'AI 补充内容'
 
 /**
- * Clamp a model-supplied integer into a budget window.
- * @param value - schema-validated candidate, absent when omitted.
- * @param fallback - value applied when omitted or non-finite.
+ * Clamp a schema-validated integer into a budget window.
+ * @param value - candidate, absent when the model omitted it.
+ * @param fallback - value applied when omitted.
  * @param min - inclusive lower bound.
  * @param max - inclusive upper bound.
  * @returns the clamped integer.
  */
 function clampInteger(value: number | undefined, fallback: number, min: number, max: number): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback
+  if (value === undefined) return fallback
   return Math.min(Math.max(Math.trunc(value), min), max)
 }
 
@@ -112,6 +184,13 @@ function clampInteger(value: number | undefined, fallback: number, min: number, 
 function trimmedOrUndefined(value: string | undefined): string | undefined {
   const trimmed = value?.trim()
   return trimmed !== undefined && trimmed.length > 0 ? trimmed : undefined
+}
+
+/** Target coordinates of one descendant-walk read. */
+interface ReadTarget {
+  pageId: string
+  depth: number
+  parentPageId?: string
 }
 
 /** One page entry of the read tool's canonical output. */
@@ -188,6 +267,25 @@ function resolveWriteRequest(args: WriteTargetArgs): ResolvedWriteRequest {
   return { action: args.action, pageId, ...title === undefined ? {} : { title }, contentMarkdown }
 }
 
+/** Build one fetched descendant entry, omitting absent metadata fields. */
+function fetchedEntry(
+  target: ReadTarget,
+  item: { pageId: string; title: string; url: string; version?: number | undefined },
+  body: { text: string; truncated: boolean },
+): ReadPageEntry {
+  const itemUrl = item.url.length > 0 ? item.url : undefined
+  return {
+    pageId: item.pageId,
+    ...target.parentPageId === undefined ? {} : { parentPageId: target.parentPageId },
+    depth: target.depth,
+    title: item.title,
+    ...itemUrl === undefined ? {} : { url: itemUrl },
+    ...item.version === undefined ? {} : { version: item.version },
+    text: body.text,
+    truncated: body.truncated,
+  }
+}
+
 /** Render one canonical value as the pretty-JSON Native content hydra shipped. */
 function renderJson(value: unknown): { type: 'text'; text: string }[] {
   return [{ type: 'text', text: JSON.stringify(value, null, 2) }]
@@ -226,7 +324,8 @@ const WRITE_PARAMETERS = {
  * @param ctx - registrant context carrying the tool registry.
  * @param config - deployment's explicit wiki policy and budgets.
  */
-export function apply(ctx: Context, config: Config): void {
+export function apply(ctx: Context, rawConfig: Config): void {
+  const config = resolveConfig(rawConfig)
   const budgets = config.read
 
   if (config.applyWriteApproval === 'ask') {
@@ -372,7 +471,7 @@ export function apply(ctx: Context, config: Config): void {
         maxPages,
         signal: exec.signal,
       })
-      const targets: { pageId: string; depth: number; parentPageId?: string }[] = [
+      const targets: ReadTarget[] = [
         { pageId, depth: 0 },
         ...tree.pages.map((page: WikiPageSummary) => ({
           pageId: page.pageId,
@@ -394,34 +493,15 @@ export function apply(ctx: Context, config: Config): void {
             signal: exec.signal,
           })
           const pageBudget = Math.min(maxCharsPerPage, Math.max(remainingChars, 0))
-          const itemUrl = item.url.length > 0 ? item.url : undefined
           if (pageBudget === 0) {
             contentTruncated = true
-            pages.push({
-              pageId: item.pageId,
-              ...target.parentPageId === undefined ? {} : { parentPageId: target.parentPageId },
-              depth: target.depth,
-              title: item.title,
-              ...itemUrl === undefined ? {} : { url: itemUrl },
-              ...item.version === undefined ? {} : { version: item.version },
-              text: '',
-              truncated: true,
-            })
+            pages.push(fetchedEntry(target, item, { text: '', truncated: true }))
             continue
           }
           const converted = htmlToText(item.html, { maxChars: pageBudget })
           remainingChars -= converted.text.length
           contentTruncated ||= converted.truncated
-          pages.push({
-            pageId: item.pageId,
-            ...target.parentPageId === undefined ? {} : { parentPageId: target.parentPageId },
-            depth: target.depth,
-            title: item.title,
-            ...itemUrl === undefined ? {} : { url: itemUrl },
-            ...item.version === undefined ? {} : { version: item.version },
-            text: converted.text,
-            truncated: converted.truncated,
-          })
+          pages.push(fetchedEntry(target, item, converted))
         } catch (err) {
           // Cancellation must stop the walk; only per-page read failures are
           // recorded and skipped.
@@ -431,6 +511,7 @@ export function apply(ctx: Context, config: Config): void {
             pageId: target.pageId,
             ...target.parentPageId === undefined ? {} : { parentPageId: target.parentPageId },
             depth: target.depth,
+            /* v8 ignore next -- the client rejects with Error only; the String arm guards foreign throwables. */
             error: err instanceof Error ? err.message : String(err),
           })
         }
