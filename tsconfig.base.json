@@ -142,11 +142,14 @@
         "./packages/identity/*/src/invariant.ts",
         "./packages/test-support/*/src/invariant.ts"
       ],
-      // host/client package names prefix the group dir (dsh-client-<dir>), so
-      // the generic dsh-*/invariant list above cannot map them; strip the
-      // group prefix with a dedicated wildcard per group instead.
+      // host/client/intranet package names prefix the group dir
+      // (dsh-client-<dir>), so the generic dsh-*/invariant list above cannot
+      // map them; strip the group prefix with a dedicated wildcard per group
+      // instead.
       "@deepseek-ai/dsh-host-*/invariant": ["./packages/host/*/src/invariant.ts"],
       "@deepseek-ai/dsh-client-*/invariant": ["./packages/client/*/src/invariant.ts"],
+      "@deepseek-ai/dsh-intranet-*/invariant": ["./packages/intranet/*/src/invariant.ts"],
+      "@deepseek-ai/dsh-intranet-*": ["./packages/intranet/*/src"],
       "@deepseek-ai/dsh-headless/startup": ["./packages/bundle/headless/src/startup.ts"],
       "@deepseek-ai/dsh-web-app/startup": ["./packages/bundle/web-app/src/startup.ts"],
       "@deepseek-ai/dsh-client-*/client": ["./packages/client/*/src/client"],
