@@ -1,0 +1,15 @@
+# Company-intranet tool rows stacked over dsh-base. Credential values never
+# live here: both tools read their endpoint and token through the credential
+# references their configs default to (INTRANET_WIKI_* / INTRANET_GITLAB_*),
+# resolved per call from the credentials service or the launching environment.
+- insert:
+    # The wiki write path stays behind the approval seam: `ask` routes every
+    # intranet_wiki_apply_write call through ctx.approval and fails closed in
+    # compositions without one.
+    - id: intranet-tool-wiki
+      name: '@deepseek-ai/dsh-intranet-tool-wiki'
+      config:
+        applyWriteApproval: ask
+
+    - id: intranet-tool-gitlab
+      name: '@deepseek-ai/dsh-intranet-tool-gitlab'

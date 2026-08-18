@@ -272,6 +272,7 @@
     { "path": "./packages/todo/tool-todo" },
     { "path": "./packages/intranet/tool-wiki" },
     { "path": "./packages/intranet/tool-gitlab" },
+    { "path": "./packages/bundle/intranet" },
     { "path": "./packages/plan/plan-mode" },
     { "path": "./packages/preset/agent-presets" },
     { "path": "./packages/preset/persona" },

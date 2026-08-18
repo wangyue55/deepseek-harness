@@ -1265,6 +1265,28 @@ importers:
         specifier: workspace:^
         version: link:../../core/session
 
+  packages/bundle/intranet:
+    dependencies:
+      '@deepseek-ai/dsh-intranet-tool-gitlab':
+        specifier: workspace:^
+        version: link:../../intranet/tool-gitlab
+      '@deepseek-ai/dsh-intranet-tool-wiki':
+        specifier: workspace:^
+        version: link:../../intranet/tool-wiki
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/cordis-plugin-include':
+        specifier: workspace:^
+        version: link:../../../vendor/include
+      '@deepseek-ai/cordis-plugin-loader':
+        specifier: workspace:^
+        version: link:../../../vendor/loader
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+
   packages/bundle/web-app:
     dependencies:
       '@deepseek-ai/dsh-agent-presets':
