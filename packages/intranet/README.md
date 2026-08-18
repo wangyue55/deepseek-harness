@@ -7,5 +7,6 @@ Model-facing tools for company-internal services, migrated from the hydra-agent 
 | Package | Role | ctx key |
 |---|---|---|
 | [`tool-wiki/`](tool-wiki/README.md) | Confluence-style wiki reading and approval-gated write-back tools | registers on `ctx.tools` |
+| [`tool-gitlab/`](tool-gitlab/README.md) | GitLab project resolution, clue-driven scope discovery, and read-only impact analysis | registers on `ctx.tools` |
 
 The migration rationale and the deliberately deferred seam split live in the [migration Agent Note](../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.md).

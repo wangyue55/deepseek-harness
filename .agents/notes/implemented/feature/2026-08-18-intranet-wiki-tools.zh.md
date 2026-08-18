@@ -23,6 +23,8 @@ hydra-agent 项目基于 Confluence 风格 REST API 运行三个生产内网 Wik
 
 **保真移植,只做契约层改动。**客户端、HTML 转文本与 Markdown 转 storage 转换器为行级移植(新增 signal 贯通与类型化 JSON 收窄)。字符串返回改为声明输出 schema 下的规范值:hydra 的两种读取形态合并为单一页面列表形态,`ok:false` 版本冲突改为领域结果 `status: 'version_conflict'`,`"Error: ..."` 字符串改为抛错。`output.render` 保持规范值的美化 JSON,与被迁移提示词的消费方式一致。诊断文案改为英文;回退标题 `AI 补充内容` 保持中文,因为它会写入 Wiki 页面。
 
+**同一组决策约束 `@deepseek-ai/dsh-intranet-tool-gitlab`**(`packages/intranet/tool-gitlab`,`intranet_gitlab_analyze_code_source` 工具):单 Consumer 包、按调用解析的凭证引用、默认沿用 hydra 生产值的配置预算、signal 贯通与美化 JSON 呈现。其迁移另外删除了 legacy 的 `projectRef`/`projectId` 定位回退——解析现在总是产出完整项目元数据,从输出中移除了元数据警告路径——并原样保留公司指南路径 `docs/agent/模块代码定位指南.md`,诊断文案则改为英文。
+
 ## Alternatives considered
 
 **现在就建 Wiki 能力接缝。**否决:当前没有第二个 provider 或非工具消费方;预发布姿态让日后拆分代价很低。

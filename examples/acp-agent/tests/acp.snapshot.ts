@@ -59,6 +59,7 @@ const SUBAGENT_CONTINUABLE_INHERITANCE_CONFIG = fileURLToPath(
 const LSP_CONFIG = fileURLToPath(new URL('./lsp.cordis.yml', import.meta.url))
 const WEB_CONFIG = fileURLToPath(new URL('../web.cordis.yml', import.meta.url))
 const INTRANET_WIKI_CONFIG = fileURLToPath(new URL('../intranet-wiki.cordis.yml', import.meta.url))
+const INTRANET_GITLAB_CONFIG = fileURLToPath(new URL('../intranet-gitlab.cordis.yml', import.meta.url))
 const FS_SEARCH_CONFIG = fileURLToPath(new URL('./fs-search.cordis.yml', import.meta.url))
 const PARTIAL_LANDLOCK_CONFIG = fileURLToPath(new URL('../partial-landlock.cordis.yml', import.meta.url))
 const PWSH_CONFIG = fileURLToPath(new URL('./pwsh.cordis.yml', import.meta.url))
@@ -313,6 +314,18 @@ const SCENARIOS: Scenario[] = [
       DSH_PERMISSION_MODE: 'workspace-write',
       INTRANET_WIKI_SNAPSHOT_BASE_URL: 'http://127.0.0.1:43121',
       INTRANET_WIKI_SNAPSHOT_TOKEN: 'snapshot-token',
+    },
+  },
+  // The REAL GitLab client, discovery probes, and bounded reading run against
+  // the loopback fixture (fixed port): one analyze call over a user path.
+  {
+    name: 'intranet-gitlab',
+    hasModelTurn: true,
+    recorded: true,
+    configPath: INTRANET_GITLAB_CONFIG,
+    env: {
+      INTRANET_GITLAB_SNAPSHOT_BASE_URL: 'http://127.0.0.1:43122',
+      INTRANET_GITLAB_SNAPSHOT_TOKEN: 'snapshot-token',
     },
   },
   {

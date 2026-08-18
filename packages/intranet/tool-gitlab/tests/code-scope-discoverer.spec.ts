@@ -48,13 +48,13 @@ describe('guidance probing', () => {
   it('collects CLAUDE.md, its referenced guides, and the module guide it names', async () => {
     const result = await discover({
       files: {
-        'CLAUDE.md': `see [guide](${GUIDE}) and [arch](docs/arch.md) plus [gone](docs/gone.md)`,
+        'CLAUDE.md': `see [guide](${GUIDE}) and [arch](guides/arch.md) plus [gone](guides/gone.md)`,
         [GUIDE]: 'guide body',
-        'docs/arch.md': 'arch body',
+        'guides/arch.md': 'arch body',
       },
       blobs: {},
     }, { moduleHints: ['heads'] })
-    expect(result.guidanceFiles).toEqual(['CLAUDE.md', GUIDE, 'docs/arch.md'])
+    expect(result.guidanceFiles).toEqual(['CLAUDE.md', GUIDE, 'guides/arch.md'])
   })
 
   it('warns when the module guide exists but CLAUDE.md ignores it', async () => {
@@ -68,11 +68,11 @@ describe('guidance probing', () => {
   it('skips external, absolute, and parent-escaping markdown references', async () => {
     const result = await discover({
       files: {
-        'CLAUDE.md': '[x](https://e.example/a.md) [y](/abs.md) [z](../up.md) [ok](docs/ok.md)',
-        'docs/ok.md': 'ok',
+        'CLAUDE.md': '[x](https://e.example/a.md) [y](/abs.md) [z](../up.md) [ok](guides/ok.md)',
+        'guides/ok.md': 'ok',
       },
     }, { moduleHints: ['heads'] })
-    expect(result.guidanceFiles).toEqual(['CLAUDE.md', 'docs/ok.md'])
+    expect(result.guidanceFiles).toEqual(['CLAUDE.md', 'guides/ok.md'])
   })
 })
 

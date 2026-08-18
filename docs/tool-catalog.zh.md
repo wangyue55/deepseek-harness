@@ -40,6 +40,7 @@
 | `@deepseek-ai/dsh-tool-jobs` | `job_kill`、`job_list`、`job_output` | `ctx.tools`、`ctx.jobs`、`ctx.systemPrompt` | `tool/call`、`tool/result`、`user/message via agent.inject() for background completion notices` | - | 与任务种类无关的后台任务控制器：后台 bash 命令、PTY 发送和 subagent 都通过相同的 3 个工具读取、列出和终止。加载该插件会挂接控制器，从而启用生产方的 `ctx.jobs.start()`。 |
 | `@deepseek-ai/dsh-tool-todo` | `todo_write` | `ctx.tools`、`owning Agent session` | `tool/call`、`todo/write`、`tool/result` | - | todo_write 是会话所有的状态；UI 将最新的 todo/write 事件渲染为检查清单。`allowParallelInProgress` 是没有默认值的必填项，因此本目录明确选择 `true`，对应描述允许同时存在多个 `in_progress` 项。选择 `false` 的部署会获得同一工具，但描述会要求只能有 1 个活动任务。 |
 | `@deepseek-ai/dsh-intranet-tool-wiki` | `intranet_wiki_apply_write`, `intranet_wiki_prepare_write`, `intranet_wiki_read_page` | `ctx.tools`, `credential references (default INTRANET_WIKI_BASE_URL / INTRANET_WIKI_TOKEN) resolved per call` | `tool/call`, `tool/result` | - | 不在 dsh-base 中:这些公司 Wiki 工具由 intranet bundle(`@deepseek-ai/dsh-intranet`)挂载。`applyWriteApproval` 必填且无默认值,目录声明其选择:`ask`,让每次 `intranet_wiki_apply_write` 调用经过审批接缝并在缺席时失败关闭;`allow` 直接执行。读取预算与超时是配置字段,默认值沿用迁移的 hydra-agent 生产值。 |
+| `@deepseek-ai/dsh-intranet-tool-gitlab` | `intranet_gitlab_analyze_code_source` | `ctx.tools`, `credential references (default INTRANET_GITLAB_BASE_URL / INTRANET_GITLAB_TOKEN) resolved per call` | `tool/call`, `tool/result` | - | 不在 dsh-base 中:该公司 GitLab 分析工具由 intranet bundle(`@deepseek-ai/dsh-intranet`)挂载。每个配置字段都有沿用迁移 hydra-agent 生产值的默认值;发现与读取预算是配置字段,只读分析会拒绝既无代码路径也无需求线索的调用。 |
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`、`ctx.workflowEngine`、`ctx.systemPrompt`、`a calling Agent (exec.agent parents the script children)` | `tool/call`、`tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`、`web_search` | `ctx.tools`、`ctx.web`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | web_search 和 web_fetch 将提供方选择置于 ctx.web 之后，使模型可见 schema 在更换后端时保持稳定。 |
 
@@ -1881,6 +1882,87 @@ todo_write 是会话所有的状态；UI 将最新的 todo/write 事件渲染为
 来源:[`packages/intranet/tool-wiki/src/index.ts`](../packages/intranet/tool-wiki/src/index.ts)
 
 Not in dsh-base: the intranet bundle (`@deepseek-ai/dsh-intranet`) mounts these company-wiki tools. `applyWriteApproval` is required with no default, so the catalog states its choice: `ask`, which routes every `intranet_wiki_apply_write` call through the approval seam and fails closed without one; `allow` executes directly. Read budgets and timeouts are config fields whose defaults mirror the migrated hydra-agent production values.
+
+<a id="deepseek-aidsh-intranet-tool-gitlab"></a>
+
+## `@deepseek-ai/dsh-intranet-tool-gitlab`
+
+### `intranet_gitlab_analyze_code_source`
+
+解析内网 GitLab 项目,必要时用需求线索发现并验证相关代码,与用户路径比对,然后读取并分析有界的生效范围。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "projectLocator": {
+      "type": "string",
+      "description": "GitLab project identifier: numeric ID, final project name, full namespace path, or intranet GitLab project URL"
+    },
+    "ref": {
+      "type": "string",
+      "description": "Branch, tag, or commit SHA; defaults to the project default branch"
+    },
+    "paths": {
+      "type": "array",
+      "description": "File or directory paths to read and analyze",
+      "items": {
+        "type": "string"
+      }
+    },
+    "moduleHints": {
+      "type": "array",
+      "description": "Module, page, or business names extracted from the user's exact wording and requirement wiki",
+      "items": {
+        "type": "string"
+      }
+    },
+    "routeHints": {
+      "type": "array",
+      "description": "Known URL or route fragments",
+      "items": {
+        "type": "string"
+      }
+    },
+    "apiHints": {
+      "type": "array",
+      "description": "Known API paths, events, or service names",
+      "items": {
+        "type": "string"
+      }
+    },
+    "uiTexts": {
+      "type": "array",
+      "description": "Distinctive UI text, button, field, dialog, or menu labels",
+      "items": {
+        "type": "string"
+      }
+    },
+    "changeDescription": {
+      "type": "string",
+      "description": "Short normalized change description; do not pass the full requirement wiki body"
+    },
+    "projectType": {
+      "type": "string",
+      "description": "Optional project type hint",
+      "enum": [
+        "auto",
+        "node",
+        "vue",
+        "react",
+        "qt"
+      ]
+    }
+  },
+  "required": [
+    "projectLocator"
+  ]
+}
+```
+
+来源:[`packages/intranet/tool-gitlab/src/index.ts`](../packages/intranet/tool-gitlab/src/index.ts)
+
+Not in dsh-base: the intranet bundle (`@deepseek-ai/dsh-intranet`) mounts this company-GitLab analysis tool. Every config field has a default mirroring the migrated hydra-agent production values; discovery and read budgets are config fields, and the read-only analysis rejects a call naming neither code paths nor requirement clues.
 
 <a id="deepseek-aidsh-tool-workflow"></a>
 

@@ -23,6 +23,8 @@ The hydra-agent project ships three production intranet wiki tools (`internal_wi
 
 **Faithful port with contract-level changes only.** The client, HTML-to-text, and Markdown-to-storage converters are line-level ports (signal threading and typed JSON narrowing added). String returns became canonical values under declared output schemas: the two hydra read shapes merged into one page-list shape, `ok:false` version conflicts became the domain outcome `status: 'version_conflict'`, and `"Error: ..."` strings became thrown errors. `output.render` stays pretty-printed JSON of the canonical value, matching what the migrated prompts consume. Diagnostics moved to English; the `AI 补充内容` fallback heading stays Chinese because it is written into wiki pages.
 
+**The same decisions govern `@deepseek-ai/dsh-intranet-tool-gitlab`** (`packages/intranet/tool-gitlab`, the `intranet_gitlab_analyze_code_source` tool): one Consumer package, per-call credential references, config budgets defaulting to the hydra production values, signal threading, and pretty-JSON rendering. Its migration additionally drops the legacy `projectRef`/`projectId` locator fallback — resolution now always yields full project metadata, which removed the metadata-warning path from the output — and keeps the company guide path `docs/agent/模块代码定位指南.md` verbatim while its diagnostics moved to English.
+
 ## Alternatives considered
 
 **A wiki capability seam now.** Rejected: no current second provider or non-tool consumer; the pre-release stance makes a later split cheap.

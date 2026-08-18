@@ -1,0 +1,14 @@
+{
+  "steps": [
+    {
+      "op": "initialize"
+    },
+    {
+      "op": "newSession"
+    },
+    {
+      "op": "prompt",
+      "text": "Call intranet_gitlab_analyze_code_source exactly once with projectLocator '4200', ref 'main', and paths ['src/main.ts']. After the result, reply with the single word DONE and stop."
+    }
+  ]
+}

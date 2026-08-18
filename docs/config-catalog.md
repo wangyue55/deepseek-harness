@@ -801,6 +801,58 @@ export interface Config {
 
 Source: [`packages/host/webserver/src/index.ts:45`](../packages/host/webserver/src/index.ts)
 
+<a id="deepseek-aidsh-intranet-tool-gitlab"></a>
+
+## `@deepseek-ai/dsh-intranet-tool-gitlab`
+
+Requires: `tools`
+
+```ts config-catalog
+/** Intranet GitLab tool configuration; every field has a default. */
+export interface Config {
+  /** Credential reference naming the GitLab API base URL. */
+  baseUrlEnv?: string
+  /** Credential reference naming the GitLab private token. */
+  tokenEnv?: string
+  /** Cooperative deadline enforced by the timeout policy. */
+  timeoutMs?: number
+  /** Cap on each hint array after de-duplication. */
+  hintLimit?: number
+  /** Clue-search budgets. */
+  discovery?: DiscoveryBudgetConfig
+  /** Source-acquisition budgets. */
+  read?: ReadBudgetConfig
+}
+
+/** Discovery-budget configuration; omitted fields keep the hydra-agent production values. */
+export interface DiscoveryBudgetConfig {
+  /** Maximum distinct hint queries searched. */
+  maxQueries?: number
+  /** Blob-search page size. */
+  searchPerPage?: number
+  /** Blob-search pages per query before truncation. */
+  searchMaxPages?: number
+  /** Maximum matched files whose content is probed for evidence. */
+  maxCandidateFiles?: number
+  /** Maximum discovered paths reported. */
+  maxDiscoveredPaths?: number
+}
+
+/** Read-budget configuration; omitted fields keep the hydra-agent production values. */
+export interface ReadBudgetConfig {
+  /** Maximum files read across every path. */
+  maxFiles?: number
+  /** Per-file character cap; larger files are skipped. */
+  maxFileChars?: number
+  /** Whole-call character cap; later files are skipped once reached. */
+  maxTotalChars?: number
+  /** Concurrent raw-file reads. */
+  readConcurrency?: number
+}
+```
+
+Source: [`packages/intranet/tool-gitlab/src/index.ts:96`](../packages/intranet/tool-gitlab/src/index.ts)
+
 <a id="deepseek-aidsh-intranet-tool-wiki"></a>
 
 ## `@deepseek-ai/dsh-intranet-tool-wiki`
