@@ -803,6 +803,15 @@
         "@deepseek-ai/.+"
       ]
     },
+    "packages/client/ui-settings-intranet": {
+      "entry": [
+        "tests/**/*.spec.{ts,tsx}"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "tests/**/*.{ts,tsx}"
+      ]
+    },
     "packages/bundle/web-app": {
       "ignoreDependencies": [
         "@deepseek-ai/.+"

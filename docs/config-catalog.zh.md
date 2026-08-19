@@ -430,6 +430,30 @@ export interface Config {
 
 来源：[`packages/client/hmr/src/index.ts:31`](../packages/client/hmr/src/index.ts)
 
+<a id="deepseek-aidsh-client-ui-settings-intranet"></a>
+
+## `@deepseek-ai/dsh-client-ui-settings-intranet`
+
+```ts config-catalog
+/**
+ * The credential references the card addresses. The defaults mirror the
+ * intranet tool packages' defaults; a deployment that renames a reference in
+ * a tool config states the same name here so the card edits the right key.
+ */
+export interface Config {
+  /** Credential reference naming the wiki API base URL. */
+  wikiBaseUrlEnv?: string
+  /** Credential reference naming the wiki bearer token. */
+  wikiTokenEnv?: string
+  /** Credential reference naming the GitLab API base URL. */
+  gitlabBaseUrlEnv?: string
+  /** Credential reference naming the GitLab private token. */
+  gitlabTokenEnv?: string
+}
+```
+
+来源:[`packages/client/ui-settings-intranet/src/index.ts:25`](../packages/client/ui-settings-intranet/src/index.ts)
+
 <a id="deepseek-aidsh-code-runtime-worker-thread"></a>
 
 ## `@deepseek-ai/dsh-code-runtime-worker-thread`

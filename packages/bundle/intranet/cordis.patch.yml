@@ -13,3 +13,9 @@
 
     - id: intranet-tool-gitlab
       name: '@deepseek-ai/dsh-intranet-tool-gitlab'
+
+    # The credentials card: the Plugins settings tab renders it because this
+    # row's Host half serves the `intranet` namespace; values are stored
+    # through the credentials service, never in settings documents.
+    - id: intranet-settings-card
+      name: '@deepseek-ai/dsh-client-ui-settings-intranet'

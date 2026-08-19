@@ -6,7 +6,7 @@
 
 ## Patch 挂载的内容
 
-两行:三个 Wiki 工具在 `applyWriteApproval: ask` 下——每次 `intranet_wiki_apply_write` 调用都经过审批接缝,缺席时失败关闭——以及按默认值挂载的只读 GitLab 分析工具。bundle 不携带凭证值:两个包的引用默认指向 `INTRANET_WIKI_BASE_URL` / `INTRANET_WIKI_TOKEN` 与 `INTRANET_GITLAB_BASE_URL` / `INTRANET_GITLAB_TOKEN`,每次调用经凭证服务或启动环境解析。
+三行:三个 Wiki 工具在 `applyWriteApproval: ask` 下——每次 `intranet_wiki_apply_write` 调用都经过审批接缝,缺席时失败关闭——按默认值挂载的只读 GitLab 分析工具,以及[凭证卡片](../../client/ui-settings-intranet/README.md),它把四个引用放上 Web 设置页。bundle 不携带凭证值:两个包的引用默认指向 `INTRANET_WIKI_BASE_URL` / `INTRANET_WIKI_TOKEN` 与 `INTRANET_GITLAB_BASE_URL` / `INTRANET_GITLAB_TOKEN`,每次调用经凭证服务或启动环境解析。
 
 ## 使用方式
 
