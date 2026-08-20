@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-intranet-tool-gitlab",
   "description": "Model-facing intranet GitLab code analysis: project resolution, clue-driven scope discovery, bounded reading, and lightweight impact analysis",
-  "version": "0.1.0-rc.7",
+  "version": "0.1.0-rc.8",
   "publishConfig": {
     "access": "public"
   },

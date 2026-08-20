@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-intranet",
   "description": "Company-intranet tools as a profile bundle: the wiki and GitLab tool rows a deployment stacks over dsh-base",
-  "version": "0.1.0-rc.7",
+  "version": "0.1.0-rc.8",
   "publishConfig": {
     "access": "public"
   },

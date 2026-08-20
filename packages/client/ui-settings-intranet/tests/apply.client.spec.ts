@@ -4,14 +4,10 @@ import { Context } from '@deepseek-ai/cordis'
 import { describe, expect, it, vi } from 'vitest'
 import { SlotRegistry } from '@deepseek-ai/dsh-client-runtime/client'
 import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
-import { TestRemote, usePinnedBrowserLanguages } from '@deepseek-ai/dsh-client-test-runtime'
-import { SettingsScopeBinder } from '@deepseek-ai/dsh-client-ui-settings/client'
+import { TestRemote } from '@deepseek-ai/dsh-client-test-runtime'
+import { apply as settingsApply, inject as settingsInject } from '@deepseek-ai/dsh-client-ui-settings/client'
 import { apply, inject } from '@deepseek-ai/dsh-client-ui-settings-intranet/client'
 import type { IntranetCardFace } from '@deepseek-ai/dsh-client-ui-settings-intranet/client'
-
-// The service reads its initial locale from the browser; these specs assert
-// the shipped Chinese copy, so they state the browser they assume.
-usePinnedBrowserLanguages('zh-CN')
 
 async function bench() {
   const ctx = new Context()
@@ -34,7 +30,7 @@ async function bench() {
       credentials: { describe: describeCredentials, set: setCredential },
     },
   } as never)
-  await ctx.plugin(SettingsScopeBinder).await()
+  await ctx.plugin({ inject: [...settingsInject], apply: settingsApply }).await()
   return { ctx, slots: ctx.get('slots') as SlotRegistry, describeCredentials, setCredential }
 }
 
@@ -63,6 +59,9 @@ describe('ui-settings-intranet apply', () => {
     expect(Object.keys(state.fields)).toEqual(['wikiBaseUrl', 'wikiToken', 'gitlabBaseUrl', 'gitlabToken'])
     expect(describeCredentials).toHaveBeenCalled()
     const locale = ctx.get('locale') as LocaleRuntime
+    // This lane has no jsdom `window`, so browser detection never runs and a
+    // fresh service opens on FALLBACK_LOCALE (en); read the zh side explicitly.
+    locale.setLocale('zh')
     const t = locale.bind('settings.intranet' as never)
     expect(t('title' as never)).toBe('内网工具')
   })
