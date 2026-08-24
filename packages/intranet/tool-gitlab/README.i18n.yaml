@@ -3,4 +3,4 @@
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/intranet/tool-gitlab/README.md
 README.md: 7785599489b086d0cb182544720a42f19bc116a5
-README.zh.md: 8287db7b38fda1d7f8ff2be3d6bb70de8cf591f0
+README.zh.md: ff17954c57503af66feabe675ccaab804422dc6b

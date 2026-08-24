@@ -84,7 +84,7 @@ describe('ui-settings-intranet apply', () => {
     await Promise.resolve()
     const calls = describeCredentials.mock.calls.length
     ;(ctx as unknown as { remote: { $dispatch(event: string, args: unknown[]): void } })
-      .remote.$dispatch('credentials/updated', ['INTRANET_WIKI_TOKEN'])
+      .remote.$dispatch('credentials/reference-updated', ['INTRANET_WIKI_TOKEN'])
     await new Promise((resolve) => { setTimeout(resolve, 0) })
     expect(describeCredentials.mock.calls.length).toBeGreaterThan(calls)
   })

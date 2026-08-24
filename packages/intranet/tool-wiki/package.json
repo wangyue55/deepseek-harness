@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-intranet-tool-wiki",
   "description": "Model-facing intranet Confluence wiki tools: page reading and a prepare/apply write-back pair gated by approval",
-  "version": "0.1.0-rc.8",
+  "version": "0.1.1-rc.2",
   "publishConfig": {
     "access": "public"
   },

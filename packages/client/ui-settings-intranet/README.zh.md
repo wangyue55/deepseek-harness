@@ -6,13 +6,13 @@
 
 ## 功能
 
-Host 半注册 `intranet` settings 命名空间,其四个字段命名卡片寻址的凭证引用(`wikiBaseUrlEnv`、`wikiTokenEnv`、`gitlabBaseUrlEnv`、`gitlabTokenEnv`,默认与工具包相同的 `INTRANET_*` 名)。浏览器半注册一个 keyed `settings.plugin.item` 卡片:每个控件展示所寻址引用及其来自 `credentials.describe` 的已配置/可写状态,草稿本地暂存,一次保存经 `credentials.set` 写入——值落在凭证存储,从不进设置文档或任何响应。被关注引用的 `credentials/updated` 事件会重读其徽标,别处写入的值在这里保持真实。
+Host 半注册 `intranet` settings 命名空间,其四个字段命名卡片寻址的凭证引用(`wikiBaseUrlEnv`、`wikiTokenEnv`、`gitlabBaseUrlEnv`、`gitlabTokenEnv`,默认与工具包相同的 `INTRANET_*` 名)。浏览器半注册一个 keyed `settings.plugin.item` 卡片:每个控件展示所寻址引用及其来自 `credentials.describe` 的已配置/可写状态,草稿本地暂存,一次保存经 `credentials.set` 写入——值落在凭证存储,从不进设置文档或任何响应。被关注引用的 `credentials/reference-updated` 事件会重读其徽标,别处写入的值在这里保持真实。
 
 在工具配置里重命名了引用的部署,在本 section(组合配置或卡片自身的 settings 层)声明同名,卡片才编辑正确的键。
 
 ## 打包
 
-双半插件:Host 半在 `src/`,浏览器半在 `src/client/`,`cordis.yml` 挂载本包时由 client 模块系统按构建产物 `./client` 提供。[`dsh-intranet`](../../bundle/intranet/README.md) bundle 把它挂在工具旁;只有 Host 提供 `intranet` 命名空间的部署才渲染此卡。
+双半插件:Host 半在 `src/`,浏览器半在 `src/client/`,`cordis.yml` 挂载本包时由 client 模块系统按构建产物 `./client` 提供。[`dsh-intranet`](../../bundle/intranet/README.zh.md) bundle 把它挂在工具旁;只有 Host 提供 `intranet` 命名空间的部署才渲染此卡。
 
 ## Model Experience
 

@@ -57,7 +57,7 @@ export function apply(ctx: ClientContext): void {
   // A credential written on another surface (the same references are plain
   // environment names) only announces itself through this forwarded event.
   ctx.effect(
-    () => ctx.remote.$on('credentials/updated', (ref) => { controller.refreshCredential(ref) }),
+    () => ctx.remote.$on('credentials/reference-updated', (ref) => { controller.refreshCredential(ref) }),
     'ui-settings-intranet: credential invalidations',
   )
 

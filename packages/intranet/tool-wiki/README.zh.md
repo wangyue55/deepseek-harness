@@ -12,7 +12,7 @@
 - `intranet_wiki_prepare_write` — 回写的只读第一步:校验目标、把 Markdown 渲染为 storage 格式,并返回写入计划(目标页、生效标题、追加所需的 `baseVersion`、完整 `contentMarkdown` 与标题摘要),不改动 Wiki。
 - `intranet_wiki_apply_write` — 写入本身:`create_child` 在父页下创建子页,`append_page` 在标题下以下一版本号追加。`baseVersion` 不再匹配时返回领域结果 `status: 'version_conflict'` 而不写入;基础设施失败则抛错。
 
-Wiki 端点是公司 Confluence 风格 REST API;客户端、HTML 转文本与 Markdown 转 storage 转换器移植自 hydra-agent 实现([Agent Note](../../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.md))。
+Wiki 端点是公司 Confluence 风格 REST API;客户端、HTML 转文本与 Markdown 转 storage 转换器移植自 hydra-agent 实现([Agent Note](../../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.zh.md))。
 
 ## 审批策略
 
@@ -36,7 +36,7 @@ Wiki 端点是公司 Confluence 风格 REST API;客户端、HTML 转文本与 Ma
 
 ## 导出形态
 
-函数/命名空间插件:导出 `name` / `inject` / `Config` / `apply`,没有 default 导出([postmortem 0001](../../../docs/postmortem/0001-acp-default-export-drops-inject.md))。
+函数/命名空间插件:导出 `name` / `inject` / `Config` / `apply`,没有 default 导出([postmortem 0001](../../../docs/postmortem/0001-acp-default-export-drops-inject.zh.md))。
 
 ## Model Experience
 
@@ -44,7 +44,7 @@ Wiki 端点是公司 Confluence 风格 REST API;客户端、HTML 转文本与 Ma
 
 #### What the model sees
 
-生成的 [`dsh-intranet-tool-wiki` schemas](../../../docs/tool-catalog.md#deepseek-aidsh-intranet-tool-wiki)。预算参数描述会插入配置的默认值与上限。
+生成的 [`dsh-intranet-tool-wiki` schemas](../../../docs/tool-catalog.zh.md#deepseek-aidsh-intranet-tool-wiki)。预算参数描述会插入配置的默认值与上限。
 
 #### Token effect
 
@@ -72,4 +72,4 @@ Wiki 端点是公司 Confluence 风格 REST API;客户端、HTML 转文本与 Ma
 
 - **无自动化真实写入覆盖** — 真实 API 冒烟只做读取与准备;对真实 Wiki 的 `create_child` 仅在 `INTRANET_WIKI_E2E_PARENT_PAGE` 指定沙箱父页时运行,常规 e2e 不会改动 Wiki。
 - **仅第一版写入动作** — `create_child` 与 `append_page`;不支持替换或编辑既有页面内容,与被迁移实现一致。
-- **手写转换器** — HTML 转文本与 Markdown 转 storage 是移植的 hydra 实现;维护型依赖的替换候选记录在[迁移 Agent Note](../../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.md)。
+- **手写转换器** — HTML 转文本与 Markdown 转 storage 是移植的 hydra 实现;维护型依赖的替换候选记录在[迁移 Agent Note](../../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.zh.md)。

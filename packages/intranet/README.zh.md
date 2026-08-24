@@ -6,7 +6,7 @@
 
 | Package | Role | ctx key |
 |---|---|---|
-| [`tool-wiki/`](tool-wiki/README.md) | Confluence 风格 Wiki 读取与审批门控回写工具 | registers on `ctx.tools` |
-| [`tool-gitlab/`](tool-gitlab/README.md) | GitLab 项目解析、线索驱动的范围发现与只读影响分析 | registers on `ctx.tools` |
+| [`tool-wiki/`](tool-wiki/README.zh.md) | Confluence 风格 Wiki 读取与审批门控回写工具 | registers on `ctx.tools` |
+| [`tool-gitlab/`](tool-gitlab/README.zh.md) | GitLab 项目解析、线索驱动的范围发现与只读影响分析 | registers on `ctx.tools` |
 
-迁移理由与刻意推迟的接缝拆分记录在[迁移 Agent Note](../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.md)。
+迁移理由与刻意推迟的接缝拆分记录在[迁移 Agent Note](../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.zh.md)。

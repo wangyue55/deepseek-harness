@@ -10,7 +10,7 @@
 
 发现阶段还会探测项目的 `CLAUDE.md` 与公司约定的 `docs/agent/模块代码定位指南.md`,把链接到的指南作为 `guidanceFiles` 应用。未形成可验证范围时,规范值携带 `analysis: null` 加警告,而不是猜测。
 
-客户端、解析器、发现器、读取器与分析器移植自 hydra-agent 实现;删除了 legacy 的 `projectRef`/`projectId` 定位回退,因此解析总是产出完整项目元数据([Agent Note](../../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.md))。
+客户端、解析器、发现器、读取器与分析器移植自 hydra-agent 实现;删除了 legacy 的 `projectRef`/`projectId` 定位回退,因此解析总是产出完整项目元数据([Agent Note](../../../.agents/notes/implemented/feature/2026-08-18-intranet-wiki-tools.zh.md))。
 
 ## 凭证
 
@@ -26,7 +26,7 @@
 
 ## 导出形态
 
-函数/命名空间插件:导出 `name` / `inject` / `Config` / `apply`,没有 default 导出([postmortem 0001](../../../docs/postmortem/0001-acp-default-export-drops-inject.md))。
+函数/命名空间插件:导出 `name` / `inject` / `Config` / `apply`,没有 default 导出([postmortem 0001](../../../docs/postmortem/0001-acp-default-export-drops-inject.zh.md))。
 
 ## Model Experience
 
@@ -34,7 +34,7 @@
 
 #### What the model sees
 
-生成的 [`dsh-intranet-tool-gitlab` schema](../../../docs/tool-catalog.md#deepseek-aidsh-intranet-tool-gitlab)。
+生成的 [`dsh-intranet-tool-gitlab` schema](../../../docs/tool-catalog.zh.md#deepseek-aidsh-intranet-tool-gitlab)。
 
 #### Token effect
 

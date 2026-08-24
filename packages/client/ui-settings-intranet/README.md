@@ -6,7 +6,7 @@ The intranet credentials card: one entry in the Plugins settings tab that shows 
 
 ## What it does
 
-The Host half registers the `intranet` settings namespace whose four fields name the credential references the card addresses (`wikiBaseUrlEnv`, `wikiTokenEnv`, `gitlabBaseUrlEnv`, `gitlabTokenEnv`, defaulting to the `INTRANET_*` names the tool packages also default to). The browser half registers one keyed `settings.plugin.item` card: each control shows the addressed reference and its configured/writable state from `credentials.describe`, stages drafts locally, and one save writes them through `credentials.set` — values land in the credentials store, never in settings documents or responses. A `credentials/updated` event for a watched reference re-reads its badge, so a value written on another surface stays truthful here.
+The Host half registers the `intranet` settings namespace whose four fields name the credential references the card addresses (`wikiBaseUrlEnv`, `wikiTokenEnv`, `gitlabBaseUrlEnv`, `gitlabTokenEnv`, defaulting to the `INTRANET_*` names the tool packages also default to). The browser half registers one keyed `settings.plugin.item` card: each control shows the addressed reference and its configured/writable state from `credentials.describe`, stages drafts locally, and one save writes them through `credentials.set` — values land in the credentials store, never in settings documents or responses. A `credentials/reference-updated` event for a watched reference re-reads its badge, so a value written on another surface stays truthful here.
 
 A deployment that renames a reference in a tool config states the same name in this section (composition config or the card's own settings layer) so the card edits the right key.
 
